@@ -21,3 +21,20 @@ generate Adres:
 	post-code, City, ulica, musza byc zgodne -> csv 
 	numer domu/mieszkania
 
+Stworzyć django projekt
+strona startowa, strona wyswietljaca wygenerowane dane 
+
+aplikacja do importu danych danych z csv.
+każda tabela importowana w osobnej funkcji
+przed importowaniem, czyszczenie tabeli
+
+wykonanie import za pomocą komendy(wszystkie tabele naraz)
+
+w modelach dodać tabele :
+
+first_male_names (id, name)
+first_female_names (id, name)
+last_male_names (id, name)
+last_female_names (id, name)
+address (id, post-code, city, street, street_number, flat_number)
+random person (id, first_name, last_name, gender, birth_date, pesel, id_card, phone, zip-code, city, street, street_number, flat_number)

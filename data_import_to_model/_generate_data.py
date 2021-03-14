@@ -6,6 +6,18 @@ import csv
 
 DATA_CSV = Path.cwd() / 'data_csv'
 
+
+class FakePersonGenerator():
+    def __init__(self):
+        self.gender = generate_gender()
+        self.first_name = generate_first_name(self.gender)#baza danych
+        self.last_name = generate_last_name(self.gender)#baza danych
+        self.birth_date = generate_birth_date()
+        self.pesel = generate_pesel(self.gender, self.birth_date)
+        self.id_card = generate_id_card()
+        self.address = generate_address() #baza danych
+        self.phone_number = generate_fake_phone_number()
+
 # TO DO convert to class
 def generate_fake_phone_number():
     number = ''
@@ -154,6 +166,4 @@ def create_random_person():
             *generate_address()
 
 
-
-print(create_random_person())
 
