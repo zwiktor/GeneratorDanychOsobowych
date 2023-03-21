@@ -1,10 +1,53 @@
 import random
 import string
 import datetime
-from pathlib import Path
+from FakePersonGenerator import settings
+from data_import_to_model.models import *
+from abc import ABC, abstractmethod
+
 import csv
 
-DATA_CSV = Path.cwd() / 'data_csv'
+
+class BasicPersonGenerator(ABC):
+    @abstractmethod
+    def __init__(self, gender=0):
+        self.gender = generate_gender(gender)
+
+    @abstractmethod
+    def jsonify(self):
+        pass
+
+    @abstractmethod
+    def xmlify(self):
+        pass
+
+
+class FullNamePersonGenerator(BasicPersonGenerator):
+    def __init__(self, gender=0):
+        super().__init__(gender)
+        self.first_name = generate_first_name(self.gender)
+        self.last_name = generate_last_name(self.gender)
+
+    def jsonify(self):
+        pass
+
+    def xmlify(self):
+        pass
+
+
+class PeselPersonGenerator(FullNamePersonGenerator):
+    def __init__(self, gender=0):
+        super().__init__(gender)
+        self.birth_date = generate_birth_date()
+        self.pesel = generate_pesel(self.gender, self.birth_date)
+
+
+class FullPersonGenerator(PeselPersonGenerator):
+    def __init__(self, gender=0):
+        super().__init__(gender)
+        self.id_card = generate_id_card()
+        self.phone_number = generate_fake_phone_number()
+        self.address = generate_address() #baza danych
 
 
 class FakePersonGenerator():
@@ -17,6 +60,9 @@ class FakePersonGenerator():
         self.id_card = generate_id_card()
         self.address = generate_address() #baza danych
         self.phone_number = generate_fake_phone_number()
+    # Dodanie kilku konfiguracji tworzenia danych
+
+
 
 # TO DO convert to class
 def generate_fake_phone_number():
@@ -26,6 +72,7 @@ def generate_fake_phone_number():
     for i in range(8):
         number += str(random.randint(1, 9))
     return number
+
 
 # TO DO convert to class input
 def generate_birth_date():
@@ -39,8 +86,17 @@ def generate_birth_date():
 
     return str(random_date)
 
-def generate_gender():
-    return random.choice(['M', 'K'])
+
+def generate_gender(gender):
+    if gender == 1:
+        return 'M'
+    elif gender == 2:
+        return 'K'
+    elif gender == 0:
+        return random.choice(['M', 'K'])
+    else:
+        raise Exception('It can be 1=Male or 2=Female or 0=random gender')
+
 
 def generate_pesel(gender, birth_date):
     pesel = ''
@@ -72,6 +128,7 @@ def generate_pesel(gender, birth_date):
 
     return pesel
 
+
 def generate_id_card():
     number_of_weights = [7, 3, 1, 7, 3, 1, 7, 3]
     card_series = random.choices(string.ascii_uppercase, k=3)
@@ -81,64 +138,31 @@ def generate_id_card():
     control_number = [str(sum(int(number_of_weights[i]) * int(card_id[i])  for i in range(len(number_of_weights))) % 10)]
     return ''.join((card_series + control_number + card_number))
 
-def generate_first_name(gender):
+
+def generate_first_name(gender='M'):
     if gender == 'M':
-        with open(DATA_CSV / 'Imiona_Meskie.csv') as csv_file:
-            random_first_name = ''
-            csv_reader = csv.reader(csv_file, delimiter=',')
-            list_csv_reader = [i for i in csv_reader]
-            rows_count = (len(list_csv_reader))
-            random_row = random.randint(1, rows_count)
-            for index, row in enumerate(list_csv_reader):
-                if index == random_row:
-                    random_first_name = row[0]
-                    if ([i for i in random_first_name if i in string.whitespace]):
-                        random_first_name = row[0].split()[0]
-                    return random_first_name.capitalize()
-
-    elif gender == 'K':
-        with open(DATA_CSV / 'Imiona_damskie.csv') as csv_file:
-            random_first_name = ''
-            csv_reader = csv.reader(csv_file, delimiter=',')
-            list_csv_reader = [i for i in csv_reader]
-            rows_count = (len(list_csv_reader))
-            random_row = random.randint(1, rows_count)
-            for index, row in enumerate(list_csv_reader):
-                if index == random_row:
-                    random_first_name = row[0]
-                    if ([i for i in random_first_name if i in string.whitespace]):
-                        random_first_name = row[0].split()[0]
-                    return random_first_name.capitalize()
+        cls = MaleName
+    else:
+        cls = FemaleName
+    print(cls.__name__)
+    # wielkośc danych należy zapiać w oddzielnej tabeli dotyczącej importów
+    table_size = cls.objects.all().count()
+    random_id = randint(1, table_size)
+    random_obj = cls.objects.get(id=random_id)
+    return random_obj.name
 
 
-def generate_last_name(gender):
+def generate_last_name(gender='M'):
     if gender == 'M':
-        with open(DATA_CSV / 'Nazwiska_Meskie.csv') as csv_file:
-            random_last_name = ''
-            csv_reader = csv.reader(csv_file, delimiter=',')
-            list_csv_reader = [i for i in csv_reader]
-            rows_count = (len(list_csv_reader))
-            random_row = random.randint(1, rows_count)
-            for index, row in enumerate(list_csv_reader):
-                if index == random_row:
-                    random_last_name = row[0]
-                    if ([i for i in random_last_name if i in string.whitespace]):
-                        random_last_name = row[0].split()[0]
-                    return random_last_name.capitalize()
-
-    elif gender == 'K':
-        with open(DATA_CSV / 'Nazwiska_Damskie.csv') as csv_file:
-            random_last_name = ''
-            csv_reader = csv.reader(csv_file, delimiter=',')
-            list_csv_reader = [i for i in csv_reader]
-            rows_count = (len(list_csv_reader))
-            random_row = random.randint(1, rows_count)
-            for index, row in enumerate(list_csv_reader):
-                if index == random_row:
-                    random_last_name = row[0]
-                    if ([i for i in random_last_name if i in string.whitespace]):
-                        random_last_name = row[0].split()[0]
-                    return random_last_name.capitalize()
+        cls = MaleSurname
+    else:
+        cls = FemaleSurname
+    print(cls.__name__)
+    # wielkośc danych należy zapiać w oddzielnej tabeli dotyczącej importów
+    table_size = cls.objects.all().count()
+    random_id = randint(1, table_size)
+    random_obj = cls.objects.get(id=random_id)
+    return random_obj.name
 
 
 def generate_address():
@@ -154,16 +178,6 @@ def generate_address():
             if row[0] == str(random_row):
                 return [row[1], row[2].capitalize(), row[4], street_number, flat]
 
-def create_random_person():
-    gender = generate_gender()
-    birth_date = generate_birth_date()
-    return  generate_first_name(gender), \
-            generate_last_name(gender), \
-            birth_date, \
-            generate_id_card(), \
-            generate_pesel(gender, birth_date), \
-            generate_fake_phone_number(), \
-            *generate_address()
 
 
 
