@@ -1,38 +1,23 @@
-Plan for Aplication for v.1.0
+# Personal Data Generator Django App
 
-Dane:
-Imie
-Nazwisko
-Płeć
-Data urodzenia
-PESEL
+The Personal Data Generator is a Django application that enables you to generate various sets of personal data. This `README` provides an overview of the app's features and how to use it.
 
+## Data Generation Modes
 
+The app operates in three main data generation modes:
 
-Użykownik wchodzi na stornę Główną:
-	losuj nowe dane:
-	Otrzymuję info losowego użytkownika displej w tabelce:
-	moze pobrać dane użytkownika w csv, xml, json
-	Informacje w jaki sposób skorzystać z API
-Użytkownik wchodzi na url API:
-	Wyświetla dane dotyczące jednego użytkownika
-	
-generate Adres:
-	post-code, City, ulica, musza byc zgodne -> csv 
-	numer domu/mieszkania
+### Basic Mode:
+- Fields: First Name, Last Name
 
-Stworzyć django projekt
-strona startowa, strona wyswietljaca wygenerowane dane 
+### PESEL Mode:
+- Fields: First Name, Last Name, Date of Birth, PESEL (Personal Identification Number)
 
-aplikacja do importu danych danych z csv.
-każda tabela importowana w osobnej funkcji
-przed importowaniem, czyszczenie tabeli
+### Full Mode:
+- Fields: First Name, Last Name, Date of Birth, PESEL, Identity Card, Phone Number, Address
 
-wykonanie import za pomocą komendy(wszystkie tabele naraz)
-	import danych na widoku -> dodać tabelę przechowującą informację o importcie
-w modelach dodać tabele :
+## Data Sources
 
-address (id, post-code, city, street, street_number, flat_number)
-random person (id, first_name, last_name, gender, birth_date, pesel, id_card, phone, zip-code, city, street, street_number, flat_number)
-	różne tryby tworzenia FakePerson
-	
+Data is generated based on two types of data sources:
+
+1. Generation based on predefined rules, such as the PESEL, with data validation included in the testing section.
+2. Data retrieved from external sources, such as addresses or names. You have the option to load data in limited quantities using the following endpoint:
